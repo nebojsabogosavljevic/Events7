@@ -1,7 +1,7 @@
 <template>
     <v-card class="headline-card">
         <v-card-title class="headline-title">
-            <slot></slot>
+            <slot>Events App</slot>
         </v-card-title>
     </v-card>
 </template>
