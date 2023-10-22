@@ -7,198 +7,75 @@
                 </v-card-title>
                 <v-form @submit.prevent="createEvent">
                     <v-card-text>
-                    <v-text-field
-                        v-model="newEvent.name"
-                        label="Name"
-                        required
-                    ></v-text-field>
-                    <v-textarea
-                        v-model="newEvent.description"
-                        label="Description"
-                        required
-                    ></v-textarea>
-                    <v-select
-                        v-model="newEvent.type"
-                        :items="eventTypes"
-                        label="Type"
-                        required
-                    ></v-select>
-                    <v-row>
-                    <v-col>
-                        <v-slider
-                        v-model="newEvent.priority"
-                        label="Priority (0-10)"
-                        min="0"
-                        max="10"
-                        step="1"
-                        thumb-label
-                        ></v-slider>
-                    </v-col>
-                    <v-col cols="2">
                         <v-text-field
-                        v-model="newEvent.priority"
-                        label="Priority (0-10)"
-                        type="number"
-                        min="0"
-                        max="10"
+                            v-model="newEvent.name"
+                            label="Name"
+                            required
                         ></v-text-field>
-                    </v-col>
-                    </v-row>
+                        <v-textarea
+                            v-model="newEvent.description"
+                            label="Description"
+                            required
+                        ></v-textarea>
+                        <v-select
+                            v-model="newEvent.type"
+                            :items="eventTypes"
+                            label="Type"
+                            required
+                        ></v-select>
+                        <v-row>
+                            <v-col>
+                                <v-slider
+                                v-model="newEvent.priority"
+                                label="Priority (0-10)"
+                                min="0"
+                                max="10"
+                                step="1"
+                                thumb-label
+                                ></v-slider>
+                            </v-col>
+                            <v-col cols="2">
+                                <v-text-field
+                                v-model="newEvent.priority"
+                                label="Priority (0-10)"
+                                type="number"
+                                min="0"
+                                max="10"
+                                ></v-text-field>
+                            </v-col>
+                        </v-row>
                     </v-card-text>
                     <v-card-actions class="center-btn">
                         <v-btn append-icon="mdi-check-circle" type="submit" variant="outlined" color="success">Create Event</v-btn>
                     </v-card-actions>
                 </v-form>
-        </v-card>
-    </v-app>
-    <v-card class="event-list">
-        <v-card-title class="headline">
-          Event List
-        </v-card-title>
-        <v-data-table
-            :headers="headers"
-            :items="events"
-            item-key="id"
-            class="elevation-1"
-            item-selectable="selectable"
-            show-select
-            >
-            <template v-slot:items="props">
-                <tr>
-                    <td>{{ props.item.id }}</td>
-                    <td>{{ props.item.name }}</td>
-                    <td class="event-description">{{ props.item.description }}</td>
-                    <td>{{ props.item.type }}</td>
-                    <td>{{ props.item.priority }}</td>
-                </tr>
-            </template>
-            <template v-slot:[`item.actions`]="{ item }">
-                <v-icon
-                    size="small"
-                    class="me-2"
-                    @click="editEvent(item)"
-                >
-                    mdi-pencil
-                </v-icon>
-                <v-icon
-                    size="small"
-                    @click="deleteEvent(item)"
-                >
-                    mdi-delete
-                </v-icon>
-            </template>
-        </v-data-table>
-    </v-card>
-
-    <v-dialog
-        v-model="dialog"
-        max-width="500px"
-    >
-        <v-card>
-            <v-card-title>
-                <span class="text-h5">{{ formTitle }}</span>
-            </v-card-title>
-            <v-card-text>
-                <v-container>
-                    <v-row>
-                    <v-col
-                        cols="12"
-                        sm="6"
-                        md="4"
-                    >
-                        <v-text-field
-                            v-model="editingEvent.name"
-                            label="Dessert name"
-                        ></v-text-field>
-                    </v-col>
-                    <v-col
-                        cols="12"
-                        sm="6"
-                        md="4"
-                    >
-                        <v-text-field
-                            v-model="editingEvent.description"
-                            label="Calories"
-                        ></v-text-field>
-                    </v-col>
-                    <v-col
-                        cols="12"
-                        sm="6"
-                        md="4"
-                    >
-                        <v-text-field
-                            v-model="editingEvent.type"
-                            label="Fat (g)"
-                        ></v-text-field>
-                    </v-col>
-                    <v-col
-                        cols="12"
-                        sm="6"
-                        md="4"
-                    >
-                        <v-text-field
-                            v-model="editingEvent.priority"
-                            label="Carbs (g)"
-                        ></v-text-field>
-                    </v-col>
-                </v-row>
-              </v-container>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn
-                color="blue-darken-1"
-                variant="text"
-                @click="close"
-              >
-                Cancel
-              </v-btn>
-              <v-btn
-                color="blue-darken-1"
-                variant="text"
-                @click="saveEdit"
-              >
-                Save
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-        <v-dialog v-model="dialogDelete" max-width="500px">
-          <v-card>
-            <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="blue-darken-1" variant="text" @click="closeDelete">Cancel</v-btn>
-              <v-btn color="blue-darken-1" variant="text" @click="deleteItemConfirm">OK</v-btn>
-              <v-spacer></v-spacer>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+            </v-card>
+        </v-app>
+        <EventsTable :headers="headers" :events="events" @editEvent="editEvent" @deleteEvent="deleteEvent" />
     </v-container>
-    <v-snackbar
-        v-model="snackbar"
-        :timeout="3000"
-        :color="snackbarColor"
-        right
-        bottom
-    >
-        {{ message }}
-        <v-btn
-          color="white"
-          variant="text"
-          @click="snackbar = false"
-        >
-          x
-        </v-btn>
-    </v-snackbar>
+
+    <DialogDelete v-model="dialogDelete" :item="editingEvent" @closeDelete="closeDelete" @deleteItemConfirm="deleteItemConfirm" />
+    <DialogEdit v-model="dialog" :item="editingEvent" @close="close" @save-edit="saveEdit" />
+    <SnackBarMessage v-model="snackbar" :message="message" :color="snackbarColor" />
 </template>
   
 <script>
+import SnackBarMessage from '@/components/SnackBarMessage.vue';
+import DialogDelete from '@/components/DialogDelete.vue';
+import DialogEdit from '@/components/DialogEdit.vue';
+import EventsTable from '@/components/EventsTable.vue';
+
   export default {
+    components: {
+        SnackBarMessage,
+        DialogDelete,
+        DialogEdit,
+        EventsTable,
+    },
     data() {
       return {
         newEvent: {
-          id: null, // You can generate a unique ID when creating the event
+          id: null,
           name: "",
           description: "",
           type: "crosspromo",
@@ -206,7 +83,7 @@
         },
         dialog: false,
         dialogDelete: false,
-        eventTypes: ["crosspromo", "app", "game", "other"], // Array to store event types
+        eventTypes: ["crosspromo", "app", "game", "other"],
         events: [
             {id: 21, name: "click-event", description: "when the user clicks the button the event should be triggered", type: "app", priority: 0 },
             {id: 22, name: "click-event-1", description: "when the user clicks the button the event should be triggered", type: "app", priority: 0 },
@@ -231,6 +108,9 @@
         if (!this.newEvent.name) {
             this.showMessage('Please enter a name for the event.', 'error');
             return;
+        } else if (!this.newEvent.description) {
+            this.showMessage('Please enter a description for the event.', 'error');
+            return;
         }
         const uniqueId = Math.floor(Math.random() * 1000000);
         this.newEvent.id = uniqueId;
@@ -242,7 +122,8 @@
       this.editingEvent = { ...event };
       this.dialog = true;
     },
-    saveEdit () {
+    saveEdit (editedItem) {
+        this.editingEvent = editedItem;
         try {
             const index = this.events.findIndex((event) => event.id === this.editingEvent.id);
             if (index > -1) {
