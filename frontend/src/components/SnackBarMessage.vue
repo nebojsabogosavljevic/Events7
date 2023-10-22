@@ -10,7 +10,7 @@
         <v-btn
           color="white"
           variant="text"
-          @click="snackbar = false"
+          @click="hideMe"
         >
           x
         </v-btn>
@@ -34,6 +34,11 @@ export default {
         return {
         snackbar: false,
         };
+    },
+    methods: {
+        hideMe() {
+            this.$emit('hide-me');
+        },
     },
 };
 </script>

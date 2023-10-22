@@ -51,12 +51,12 @@
                 </v-form>
             </v-card>
         </v-app>
-        <EventsTable :headers="headers" :events="events" @editEvent="editEvent" @deleteEvent="deleteEvent" />
+        <EventsTable :headers="headers" :events="events" @editEvent="editEvent" @deleteEvent="deleteEvent" @deleteSelectedEvents="deleteSelectedEvents" />
     </v-container>
 
     <DialogDelete v-model="dialogDelete" :item="editingEvent" @closeDelete="closeDelete" @deleteItemConfirm="deleteItemConfirm" />
     <DialogEdit v-model="dialog" :item="editingEvent" @close="close" @save-edit="saveEdit" />
-    <SnackBarMessage v-model="snackbar" :message="message" :color="snackbarColor" />
+    <SnackBarMessage v-model="snackbar" :message="message" :color="snackbarColor" @hideMe="hideSnackbarMsg" />
 </template>
   
 <script>
@@ -150,7 +150,28 @@ import EventsTable from '@/components/EventsTable.vue';
             this.showMessage('Event not found.', 'error');
         }
         this.closeDelete()
-      },
+    },
+    deleteSelectedEvents(selectedEvents) {
+      if (selectedEvents.length === 0) {
+        this.showMessage('Please select at least one event to delete.', 'error');
+        return;
+      }
+      selectedEvents.forEach((id) => {
+        const index = this.events.findIndex((e) => e.id === id);
+        if (index > -1) {
+          this.events.splice(index, 1);
+        }
+      });
+      const allRemoved = selectedEvents.every((id) => {
+        const index = this.events.findIndex((e) => e.id === id);
+        return index === -1;
+      });
+      if (allRemoved) {
+        this.showMessage('Events deleted successfully.', 'success');
+      } else {
+        this.showMessage('Error deleting events.', 'error');
+      }
+    },
     closeDelete () {
         this.dialogDelete = false
         this.$nextTick(() => {
@@ -178,7 +199,10 @@ import EventsTable from '@/components/EventsTable.vue';
           this.editedItem = Object.assign({}, this.defaultItem)
           this.editedIndex = -1
         })
-      },
+    },
+    hideSnackbarMsg() {
+      this.snackbar = false;
+    },
   },
   watch: {
       dialog (val) {

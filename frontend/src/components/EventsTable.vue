@@ -1,7 +1,20 @@
 <template>
     <v-card class="event-list">
         <v-card-title class="headline">
-          Event List
+            <v-row no-gutters>
+                <v-col class="text-end" cols="7"> 
+                    Event List
+                </v-col>
+                <v-col class="text-end">
+                    <v-btn
+                        @click="deleteSelectedEvents"
+                        color="error"
+                        :disabled="selectedItems.length === 0"
+                    >
+                        Delete Selected
+                    </v-btn>
+                </v-col>
+            </v-row>
         </v-card-title>
         <v-data-table
             :headers="headers"
@@ -10,6 +23,7 @@
             class="elevation-1"
             item-selectable="selectable"
             show-select
+            v-model="selectedItems"
             >
             <template v-slot:items="props">
                 <tr>
@@ -54,6 +68,7 @@ export default {
         },
     },
     data: () => ({
+        selectedItems: [],
     }),
     methods: {
         editEvent(event) {
@@ -61,6 +76,9 @@ export default {
         },
         deleteEvent(event) {
             this.$emit('delete-event', event);
+        },
+        deleteSelectedEvents() {
+            this.$emit('delete-selected-events', this.selectedItems);
         },
     },
 };
