@@ -19,20 +19,26 @@
         <v-data-table
             :headers="headers"
             :items="events"
-            item-key="id"
-            class="elevation-1"
+            :item-value="item => `${item._id}`"
+            :single-select="true"
+            item-key="name"
             item-selectable="selectable"
             show-select
             v-model="selectedItems"
+            class="elevation-1"
             >
             <template v-slot:items="props">
                 <tr>
-                    <td>{{ props.item.id }}</td>
                     <td>{{ props.item.name }}</td>
-                    <td class="event-description">{{ props.item.description }}</td>
                     <td>{{ props.item.type }}</td>
                     <td>{{ props.item.priority }}</td>
                 </tr>
+            </template>
+            <template v-slot:[`item._id`]="{ item }">
+                <td :title="item._id" class="long-cell">{{ item._id }}</td>
+            </template>
+            <template v-slot:[`item.description`]="{ item }">
+                <td :title="item.description" class="long-cell">{{ item.description }}</td>
             </template>
             <template v-slot:[`item.actions`]="{ item }">
                 <v-icon
@@ -83,3 +89,13 @@ export default {
     },
 };
 </script>
+
+<style scoped> 
+.long-cell {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 50px;
+    cursor: pointer;
+}
+</style>

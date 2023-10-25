@@ -51,7 +51,7 @@
                 </v-form>
             </v-card>
         </v-app>
-        <EventsTable :headers="headers" :events="events" @editEvent="editEvent" @deleteEvent="deleteEvent" @deleteSelectedEvents="deleteSelectedEvents" />
+        <EventsTable :headers="headers" :events="events" @editEvent="editEvent" @deleteEvent="deleteSingleEvent" @deleteSelectedEvents="deleteSelected" />
     </v-container>
 
     <DialogDelete v-model="dialogDelete" :item="editingEvent" @closeDelete="closeDelete" @deleteItemConfirm="deleteItemConfirm" />
@@ -64,8 +64,9 @@ import SnackBarMessage from '@/components/SnackBarMessage.vue';
 import DialogDelete from '@/components/DialogDelete.vue';
 import DialogEdit from '@/components/DialogEdit.vue';
 import EventsTable from '@/components/EventsTable.vue';
+import { createEvent, getEvents, updateEvent, deleteEvent, deleteSelectedEvents } from '@/middleware/events.middleware';
 
-  export default {
+export default {
     components: {
         SnackBarMessage,
         DialogDelete,
@@ -75,7 +76,6 @@ import EventsTable from '@/components/EventsTable.vue';
     data() {
       return {
         newEvent: {
-          id: null,
           name: "",
           description: "",
           type: "crosspromo",
@@ -84,14 +84,10 @@ import EventsTable from '@/components/EventsTable.vue';
         dialog: false,
         dialogDelete: false,
         eventTypes: ["crosspromo", "app", "game", "other"],
-        events: [
-            {id: 21, name: "click-event", description: "when the user clicks the button the event should be triggered", type: "app", priority: 0 },
-            {id: 22, name: "click-event-1", description: "when the user clicks the button the event should be triggered", type: "app", priority: 0 },
-            {id: 20, name: "click-event-2", description: "when the user clicks the button the event should be triggered", type: "app", priority: 0 }
-        ],
+        events: [],
         editingEvent: null,
         headers: [
-            { title: 'ID', value: 'id', key: 'id' },
+            { title: 'ID', value: '_id', key: '_id' },
             { title: 'Name', value: 'name', key: 'name' },
             { title: 'Description', value: 'description', key: 'description' },
             { title: 'Type', value: 'type', key: 'type' },
@@ -103,8 +99,12 @@ import EventsTable from '@/components/EventsTable.vue';
         snackbarColor: 'success'
       };
     },
+    async mounted() {
+      this.events = await getEvents();
+      console.log(this.events);
+    },
     methods: {
-    createEvent() {
+    async createEvent() {
         if (!this.newEvent.name) {
             this.showMessage('Please enter a name for the event.', 'error');
             return;
@@ -112,38 +112,53 @@ import EventsTable from '@/components/EventsTable.vue';
             this.showMessage('Please enter a description for the event.', 'error');
             return;
         }
-        const uniqueId = Math.floor(Math.random() * 1000000);
-        this.newEvent.id = uniqueId;
-        this.events.push({ ...this.newEvent });
+
+        const createdEvent = await createEvent({
+            data: this.newEvent,
+        });
+        this.events.push({ ...createdEvent });
         this.clearForm();
+
         this.showMessage('Event created successfully.', 'success');
     },
     editEvent(event) {
       this.editingEvent = { ...event };
       this.dialog = true;
     },
-    saveEdit (editedItem) {
+    async saveEdit (editedItem) {
         this.editingEvent = editedItem;
         try {
-            const index = this.events.findIndex((event) => event.id === this.editingEvent.id);
+            const index = this.events.findIndex((event) => event._id === this.editingEvent._id);
             if (index > -1) {
-                Object.assign(this.events[index], this.editingEvent)
+              const updateResult = await updateEvent(this.editingEvent._id, this.editingEvent);
+              Object.assign(this.events[index], this.editingEvent)
+              this.showMessage('Event updated successfully.', 'success');
             } else {
+                const createEvent = await createEvent({
+                  data: {
+                      name: this.editingEvent.name,
+                      description: this.editingEvent.description,
+                      type: this.editingEvent.type,
+                      priority: this.editingEvent.priority,
+                  },
+                });
                 this.events.push(this.editingEvent)
+                this.showMessage('Event created successfully.', 'success');
             }
             this.close()
-            this.showMessage('Event updated successfully.', 'success');
         } catch (error) {
             this.showMessage('Error updating event.', 'error');
         }
       },
-    deleteEvent(event) {
+    deleteSingleEvent(event) {
         this.dialogDelete = true;
         this.editingEvent = { ...event };
     },
-    deleteItemConfirm () {
-        const index = this.events.findIndex((e) => e.id === this.editingEvent.id);
+    async deleteItemConfirm () {
+      console.log(this.editingEvent)
+        const index = this.events.findIndex((e) => e._id === this.editingEvent._id);
         if (index > -1) {
+            await deleteEvent(this.editingEvent._id);
             this.events.splice(index, 1);
             this.showMessage('Event deleted successfully.', 'success');
         } else {
@@ -151,26 +166,23 @@ import EventsTable from '@/components/EventsTable.vue';
         }
         this.closeDelete()
     },
-    deleteSelectedEvents(selectedEvents) {
+    async deleteSelected(selectedEvents) {
       if (selectedEvents.length === 0) {
         this.showMessage('Please select at least one event to delete.', 'error');
         return;
       }
+      const delSelectedResult = await deleteSelectedEvents(selectedEvents);
       selectedEvents.forEach((id) => {
-        const index = this.events.findIndex((e) => e.id === id);
+        const index = this.events.findIndex((e) => e._id === id);
         if (index > -1) {
           this.events.splice(index, 1);
         }
       });
-      const allRemoved = selectedEvents.every((id) => {
-        const index = this.events.findIndex((e) => e.id === id);
-        return index === -1;
-      });
-      if (allRemoved) {
-        this.showMessage('Events deleted successfully.', 'success');
-      } else {
+      if (!delSelectedResult.status) {
         this.showMessage('Error deleting events.', 'error');
+        return;
       }
+      this.showMessage('Events deleted successfully.', 'success');
     },
     closeDelete () {
         this.dialogDelete = false
@@ -318,7 +330,6 @@ import EventsTable from '@/components/EventsTable.vue';
 }
 
 .header-item:hover, .event-data:hover {
-  /* Remove ellipsis and display full text on hover */
   white-space: normal;
   text-overflow: clip;
 }
