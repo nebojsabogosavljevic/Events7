@@ -22,11 +22,13 @@ export class EventsService {
   }
 
   async findAll(): Promise<Event[]> {
-    return this.eventModel.find().exec();
+    const results = await this.eventModel.find().exec();
+    return results;
   }
 
   async findOne(id: number): Promise<Event> {
-    return this.eventModel.findOne({ frId: id });
+    const result = await this.eventModel.findOne({ _id: new ObjectId(id) });
+    return result;
   }
 
   async update(id: string, updateEventDto: UpdateEventDto): Promise<Response> {
