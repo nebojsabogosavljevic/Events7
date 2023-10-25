@@ -131,6 +131,10 @@ export default {
             const index = this.events.findIndex((event) => event._id === this.editingEvent._id);
             if (index > -1) {
               const updateResult = await updateEvent(this.editingEvent._id, this.editingEvent);
+              if (!updateResult.status) {
+                this.showMessage('Error updating event.', 'error');
+                return;
+              }
               Object.assign(this.events[index], this.editingEvent)
               this.showMessage('Event updated successfully.', 'success');
             } else {
